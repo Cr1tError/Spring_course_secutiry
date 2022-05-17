@@ -1,5 +1,6 @@
 package com.org.mk.security.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -9,24 +10,36 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
 
+import javax.sql.DataSource;
+
 
 @EnableWebSecurity
 public class MySecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private DataSource dataSource;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
     public void configure(AuthenticationManagerBuilder amb) throws Exception {
-      UserBuilder userBuilder = User.withDefaultPasswordEncoder();
 
-      amb.inMemoryAuthentication()
-              .withUser(userBuilder.username("Maks")
-                      .password("user")
-                      .roles("EMPLOYEE"))
-              .withUser(userBuilder.username("Ivan")
-                      .password("user")
-                      .roles("HR"))
-              .withUser(userBuilder.username("Oleg")
-                      .password("user")
-                      .roles("MANAGER", "HR"));
+        amb.jdbcAuthentication().dataSource(dataSource);
+
+//      UserBuilder userBuilder = User.withDefaultPasswordEncoder();
+//
+//      amb.inMemoryAuthentication()
+//              .withUser(userBuilder.username("Maks")
+//                      .password("user")
+//                      .roles("EMPLOYEE"))
+//              .withUser(userBuilder.username("Ivan")
+//                      .password("user")
+//                      .roles("HR"))
+//              .withUser(userBuilder.username("Oleg")
+//                      .password("user")
+//                      .roles("MANAGER", "HR"));
 
     }
 
